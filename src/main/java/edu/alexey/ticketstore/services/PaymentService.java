@@ -13,4 +13,14 @@ public class PaymentService {
 		this.transactionRepository = Objects.requireNonNull(transactionRepository);
 	}
 
+	public boolean transaction(int amount, long cardFrom, long cardTo) {
+
+		try {
+			transactionRepository.transaction(amount, cardFrom, cardTo);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+
+	}
 }
