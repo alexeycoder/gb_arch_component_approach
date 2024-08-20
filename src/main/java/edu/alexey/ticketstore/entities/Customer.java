@@ -8,23 +8,23 @@ import java.util.Objects;
 public class Customer {
 
 	private int customerId;
-	private String name;
+	private String loginName;
 	private String password;
 	private long cardNumber;
 
-	public Customer(int customerId, String name, String password, long cardNumber) {
+	public Customer(int customerId, String loginName, String password, long cardNumber) {
 		this.customerId = customerId;
-		this.name = name;
+		this.loginName = loginName;
 		this.password = password;
 		this.cardNumber = cardNumber;
 	}
 
-	public String getName() {
-		return name;
+	public String getLoginName() {
+		return loginName;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setLoginName(String name) {
+		this.loginName = name;
 	}
 
 	public String getPassword() {
@@ -49,7 +49,7 @@ public class Customer {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(cardNumber, customerId, name, password);
+		return Objects.hash(cardNumber, customerId, loginName, password);
 	}
 
 	@Override
@@ -59,15 +59,16 @@ public class Customer {
 		if (!(obj instanceof Customer))
 			return false;
 		Customer other = (Customer) obj;
-		return cardNumber == other.cardNumber && customerId == other.customerId && Objects.equals(name, other.name)
+		return cardNumber == other.cardNumber && customerId == other.customerId
+				&& Objects.equals(loginName, other.loginName)
 				&& Objects.equals(password, other.password);
 	}
 
 	@Override
 	public String toString() {
 		return String.format(
-				"Customer [customerId=%s, name=%s, password=%s, cardNumber=%016d]",
-				customerId, name, password, cardNumber);
+				"Customer [customerId=%s, loginName=%s, password=%s, cardNumber=%016d]",
+				customerId, loginName, password, cardNumber);
 	}
 
 }

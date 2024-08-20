@@ -53,7 +53,7 @@ public class DemoCustomerRepository implements CustomerRepository {
 	public Customer findByName(String customerName) {
 
 		for (var customer : CUSTOMERS) {
-			if (Objects.equals(customerName, customer.getName())) {
+			if (Objects.equals(customerName, customer.getLoginName())) {
 				return customer;
 			}
 		}
