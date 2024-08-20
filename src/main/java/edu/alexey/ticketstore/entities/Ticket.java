@@ -13,14 +13,14 @@ public class Ticket {
 	private int placeId;
 	private int price;
 	private LocalDate date;
-	private boolean isValid;
+	private boolean available;
 
-	public boolean isValid() {
-		return isValid;
+	public boolean isAvailable() {
+		return available;
 	}
 
-	public void setValid(boolean isValid) {
-		this.isValid = isValid;
+	public void setAvailable(boolean available) {
+		this.available = available;
 	}
 
 	public Integer getThicketId() {
@@ -49,7 +49,7 @@ public class Ticket {
 		this.placeId = placeId;
 		this.price = price;
 		this.date = date;
-		this.isValid = true;
+		this.available = true;
 	}
 
 	@Override
@@ -59,20 +59,20 @@ public class Ticket {
 				", Place " + placeId +
 				", Price " + price + " rub." +
 				", Date " + date +
-				", " + (isValid ? "Free" : "Busy");
+				", " + (available ? "Free" : "Busy");
 	}
 
 	public String toPrint() {
-		return "Ticket" +
-				"\nRoute Number " + routeId +
-				"\nPlace " + placeId +
-				"\nPrice " + price + "rub." +
-				"\nDate " + date;
+		return "Билет" +
+				"\nМаршрут " + routeId +
+				"\nМесто " + placeId +
+				"\nЦена " + price + "руб." +
+				"\nДата " + date;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(date, isValid, placeId, price, routeId, thicketId);
+		return Objects.hash(date, available, placeId, price, routeId, thicketId);
 	}
 
 	@Override
@@ -83,7 +83,7 @@ public class Ticket {
 			return false;
 		Ticket other = (Ticket) obj;
 		return Objects.equals(date, other.date)
-				&& isValid == other.isValid
+				&& available == other.available
 				&& placeId == other.placeId
 				&& price == other.price
 				&& routeId == other.routeId

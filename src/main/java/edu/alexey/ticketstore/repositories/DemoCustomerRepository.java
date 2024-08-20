@@ -2,9 +2,9 @@ package edu.alexey.ticketstore.repositories;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import edu.alexey.ticketstore.entities.Customer;
+import edu.alexey.ticketstore.exceptions.AlreadyExistingCustomerException;
 import edu.alexey.ticketstore.repositories.abstractions.CustomerRepository;
 
 /**
@@ -24,18 +24,16 @@ public class DemoCustomerRepository implements CustomerRepository {
 	}
 
 	@Override
-	public int create(String name, String password, long cardNumber) {
+	public Customer create(String loginName, String password, long cardNumber) throws AlreadyExistingCustomerException {
 
 		int id = CUSTOMERS.size() + 1;
-		Customer newCustomer = new Customer(id, name, password, cardNumber);
-		for (var customer : CUSTOMERS) {
-			if (customer.getCustomerId() == newCustomer.getCustomerId()) {
-				throw new RuntimeException("A customer already exists");
-			}
+		Customer newCustomer = new Customer(id, loginName, password, cardNumber);
+		if (CUSTOMERS.stream().anyMatch(c -> loginName.equalsIgnoreCase(c.getLoginName()))) {
+			throw new AlreadyExistingCustomerException();
 		}
 
 		CUSTOMERS.add(newCustomer);
-		return newCustomer.getCustomerId();
+		return newCustomer;
 	}
 
 	@Override
@@ -50,14 +48,9 @@ public class DemoCustomerRepository implements CustomerRepository {
 	}
 
 	@Override
-	public Customer findByName(String customerName) {
+	public Customer findByLoginName(String loginName) {
 
-		for (var customer : CUSTOMERS) {
-			if (Objects.equals(customerName, customer.getLoginName())) {
-				return customer;
-			}
-		}
-		return null;
+		return CUSTOMERS.stream().filter(c -> loginName.equalsIgnoreCase(c.getLoginName())).findAny().orElse(null);
 	}
 
 	@Override

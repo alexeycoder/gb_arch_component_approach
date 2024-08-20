@@ -4,15 +4,19 @@ import java.time.LocalDate;
 import java.util.List;
 
 import edu.alexey.ticketstore.entities.Ticket;
+import edu.alexey.ticketstore.exceptions.AlreadyExistingCustomerException;
+import edu.alexey.ticketstore.exceptions.AuthorizationException;
+import edu.alexey.ticketstore.exceptions.PurchaseException;
+import edu.alexey.ticketstore.services.StoreServiceFactoryImpl;
 
 /**
  * Основной класс клиентского приложения.
  */
-public class ConsoleApplicationImpl extends ConsoleApplicationBase {
+public class ConsoleApplication extends ConsoleApplicationBase {
 
-	private final StoreServicesFactory storeServicesFactory = null;
+	private final StoreServiceFactory storeServicesFactory = new StoreServiceFactoryImpl();
 	// Связь с основной логикой осуществляется через интерфейс StoreServices
-	private StoreServices customerStoreServices;
+	private StoreService customerStoreServices;
 
 	private int ticketRouteId;
 	private LocalDate ticketDate;
@@ -20,7 +24,7 @@ public class ConsoleApplicationImpl extends ConsoleApplicationBase {
 	/**
 	 * Метод запуска меню входа и регистрации
 	 */
-	public void runLoginRegisterMenu() {
+	public void runLifecycle() {
 
 		boolean run = true;
 		while (run) {
@@ -86,13 +90,25 @@ public class ConsoleApplicationImpl extends ConsoleApplicationBase {
 		try {
 
 			customerStoreServices = storeServicesFactory.forExistingCustomer(loginName, password);
-			System.out.print("Вы успешно вошли в систему...");
-			return true;
+			if (customerStoreServices != null) {
 
-		} catch (RuntimeException ex) {
+				System.out.print("Вы успешно вошли в систему...");
+				return true;
+			} else {
+				System.out.println("Такой пользователь не зарегистрирован в системе");
+				return false;
+			}
+
+		} catch (AuthorizationException e) {
 
 			System.out.println("Неудачная попытка входа в систему.");
-			System.out.println(ex.getMessage());
+			System.out.println(e.getMessage());
+			System.out.println(DIV_STR);
+
+		} catch (Exception e) {
+
+			System.out.println("Неизвестная ошибка при попытке входа в систему.");
+			e.printStackTrace();
 			System.out.println(DIV_STR);
 		}
 		return false;
@@ -111,7 +127,7 @@ public class ConsoleApplicationImpl extends ConsoleApplicationBase {
 		System.out.print("Повторите пароль: ");
 		String password2 = inputString();
 
-		if (password.equals(password2)) {
+		if (!password.equals(password2)) {
 			printMessageLine("Ошибка регистрации: Введёные пароли не совпадают.");
 			System.out.println(DIV_STR);
 			return false;
@@ -127,10 +143,16 @@ public class ConsoleApplicationImpl extends ConsoleApplicationBase {
 			System.out.print("Вы успешно зарегистрировались в системе.");
 			return true;
 
-		} catch (RuntimeException ex) {
+		} catch (AlreadyExistingCustomerException e) {
 
-			System.out.println("Возникла ошибка при регистрации.");
-			System.out.println(ex.getMessage());
+			System.out.println(
+					"Возникла ошибка при регистрации: невозможно зарегистрировать клиента с указанными данными.");
+			System.out.println(e.getMessage());
+			System.out.println(DIV_STR);
+		} catch (Exception e) {
+
+			System.out.println("Неизвестная ошибка при регистрации.");
+			e.printStackTrace();
 			System.out.println(DIV_STR);
 		}
 		return false;
@@ -274,18 +296,15 @@ public class ConsoleApplicationImpl extends ConsoleApplicationBase {
 		if (answer.equalsIgnoreCase("YES")) {
 			for (var ticket : availableTickets) {
 
-				if (ticket.getDate().equals(ticketDate) && ticket.getRouteId() == ticketRouteId && ticket.isValid()) {
+				if (ticket.getDate().equals(ticketDate) && ticket.getRouteId() == ticketRouteId
+						&& ticket.isAvailable()) {
 
-					boolean flag = false;
 					try {
-						flag = customerStoreServices.purchaseTicket(ticket);
-					} catch (RuntimeException ex) {
-						printMessageLine(ex.getMessage());
-						return;
-					}
-					if (flag) {
-						printMessageLine(ticket.toPrint());
-						return;
+						customerStoreServices.purchaseTicket(ticket);
+						printMessageLine("Билет успешно приобретён\n" + ticket.toPrint());
+
+					} catch (PurchaseException ex) {
+						printMessageLine("Ошибка. Не удалось приобрести билет!\n" + ex.getMessage());
 					}
 				}
 			}

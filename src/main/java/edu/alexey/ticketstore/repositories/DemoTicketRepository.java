@@ -25,10 +25,10 @@ public class DemoTicketRepository implements TicketRepository {
 	}
 
 	@Override
-	public List<Ticket> findValidByRoute(int routeId) {
+	public List<Ticket> findAvailableByRoute(int routeId) {
 		List<Ticket> routeTickets = new ArrayList<>();
 		for (Ticket ticket : TICKETS) {
-			if (ticket.getRouteId() == routeId && ticket.isValid()) {
+			if (ticket.getRouteId() == routeId && ticket.isAvailable()) {
 				routeTickets.add(ticket);
 			}
 		}

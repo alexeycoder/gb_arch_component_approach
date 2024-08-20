@@ -23,7 +23,7 @@ public interface TicketRepository {
 	 * @param routeId
 	 * @return
 	 */
-	List<Ticket> findValidByRoute(int routeId);
+	List<Ticket> findAvailableByRoute(int routeId);
 
 	/**
 	 * Обновить билет
